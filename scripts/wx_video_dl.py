@@ -123,7 +123,7 @@ class WXChannelsClient:
         url = self.api_base + path
         r = self.session.get(url, params=params or {}, timeout=self.timeout)
         r.raise_for_status()
-        return self._unwrap(r.json())
+        return self._unwrap(self._json_or_error(r))
 
     def _post(self, path: str, json_body: dict | None = None) -> dict:
         url = self.api_base + path
@@ -131,7 +131,7 @@ class WXChannelsClient:
             url, json=json_body or {}, timeout=self.timeout
         )
         r.raise_for_status()
-        return self._unwrap(r.json())
+        return self._unwrap(self._json_or_error(r))
 
     @staticmethod
     def _unwrap(body: dict) -> dict:
@@ -143,6 +143,16 @@ class WXChannelsClient:
                 body.get("code", -1), body.get("msg", ""), body
             )
         return body.get("data", {})
+
+    @staticmethod
+    def _json_or_error(r) -> dict:
+        """把响应体解析成 JSON；非 JSON（如工具返回 HTML 错误页）时转成 APIError。"""
+        try:
+            return r.json()
+        except ValueError:
+            raise APIError(
+                -1, f"非 JSON 响应 (HTTP {r.status_code})", {"text": r.text[:500]}
+            )
 
     # ---- 高层 ----
     def status(self) -> dict:
@@ -212,42 +222,6 @@ class WXChannelsClient:
             body["filename"] = filename
         if spec:
             body["spec"] = spec
-        return self._post("/api/task/create", body)
-
-    def task_create_full(
-        self,
-        *,
-        feed_id: str | None = None,
-        url: str | None = None,
-        title: str | None = None,
-        filename: str | None = None,
-        key: int | None = None,
-        spec: str | None = None,
-        suffix: str = "",
-        overwrite: bool = False,
-        duplicate: bool = False,
-    ) -> dict:
-        """POST /api/task/create 的完整版本（后端 gopeed 直下）。
-
-        带 url 时无需 channels 登录态也能直接下载（加密 mp4 仍要
-        解密密钥 key，工具在任务里用 labels 记录、下载完自动解）。
-        """
-        body: dict[str, Any] = {}
-        if feed_id:
-            body["id"] = feed_id
-        if url:
-            body["url"] = url
-        if title:
-            body["title"] = title
-        if filename:
-            body["filename"] = filename
-        if key is not None:
-            body["key"] = key
-        if spec:
-            body["spec"] = spec
-        body["suffix"] = suffix
-        body["overwrite"] = overwrite
-        body["duplicate"] = duplicate
         return self._post("/api/task/create", body)
 
     def task_create_channels(
@@ -1179,12 +1153,10 @@ def cmd_go(args, client: WXChannelsClient):
     这是给 WorkBuddy skill 用的主入口。唯一需要用户手动的步骤是
     「微信视频号点开一个视频」——脚本会等待并提示。
     """
-    import subprocess as _sp  # noqa
-
     print("== 1/5 启动工具 ==")
     if not ensure_tool_running():
         sys.exit("工具启动失败，请手动打开 wx_video_download.exe 后重试")
-    client = WXChannelsClient()
+    # 复用 main() 传入的 client（已按 --api 配置），不要自建默认 localhost 的
 
     print("== 2/5 检查配置 ==")
     warns = check_config()
