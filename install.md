@@ -4,13 +4,13 @@
 
 1. 把本仓库整个目录（或 `SKILL.md` + `scripts/`）复制到 WorkBuddy 技能目录：
 
-   - Windows：`C:\Users\<你>\.workbuddy\skills\wx-video-batch-download\`
-   - macOS / Linux：`~/.workbuddy/skills/wx-video-batch-download/`
+   - Windows：`C:\Users\<你>\.workbuddy\skills\wxvideo-download-hb\`
+   - macOS / Linux：`~/.workbuddy/skills/wxvideo-download-hb/`
 
    最终结构：
 
    ```
-   wx-video-batch-download/
+   wxvideo-download-hb/
    ├── SKILL.md
    ├── scripts/
    │   ├── wx_video_dl.py
@@ -25,8 +25,8 @@
 ## 方法二：git clone 到技能目录
 
 ```bash
-git clone https://github.com/<你>/wx-video-batch-download.git \
-  ~/.workbuddy/skills/wx-video-batch-download
+git clone https://github.com/<你>/wxvideo-download-hb.git \
+  ~/.workbuddy/skills/wxvideo-download-hb
 ```
 
 ## 前提
@@ -49,4 +49,4 @@ export WX_DL_TOOL_ROOT="$HOME/tools/wx_video_download_safe"
 export WX_DL_DL_DIR="$HOME/视频/video"
 ```
 
-也支持写入 `~/.workbuddy/skills/wx-video-batch-download/scripts/.env`（若使用 dotenv）或直接改脚本顶部常量。
+也支持写入 `~/.workbuddy/skills/wxvideo-download-hb/scripts/.env`（若使用 dotenv）或直接改脚本顶部常量。
