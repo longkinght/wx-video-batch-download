@@ -5,19 +5,19 @@
 ## 一、推送仓库
 
 ```bash
-cd "D:\信息收集中心\视频\wx-video-batch-download-release"
+cd "<你的发布工作目录>"
 
 git init
 git add .
-git commit -m "init: wx-video-batch-download skill + scripts + 兜底工具包说明"
+git commit -m "init: wxvideo-download-hb skill + scripts + 兜底工具包说明"
 
 # 用 gh 建仓库并推送（需先 gh auth login）
-gh repo create wx-video-batch-download --public --source=. --push
+gh repo create wxvideo-download-hb --public --source=. --push
 ```
 
 不装 gh 的话：去 github.com 手动新建空仓库，然后：
 ```bash
-git remote add origin https://github.com/<你的用户名>/wx-video-batch-download.git
+git remote add origin https://github.com/<你的用户名>/wxvideo-download-hb.git
 git branch -M main
 git push -u origin main
 ```
