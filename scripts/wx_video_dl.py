@@ -71,12 +71,13 @@ MAX_CONCURRENT_DOWNLOAD = 3  # 与工具 config.yaml 的 MaxRunning=3 对齐
 #   WX_DL_TOOL_EXE / WX_DL_TOOL_ROOT / WX_DL_DL_DIR / WX_DL_TEMPLATE
 _TOOL_EXE_ENV = os.environ.get("WX_DL_TOOL_EXE", "").strip()
 _TOOL_ROOT_ENV = os.environ.get("WX_DL_TOOL_ROOT", "").strip()
-TOOL_EXE = _TOOL_EXE_ENV or r"D:\信息收集中心\wx_video_download_safe_v260714_windows_x86_64\wx_video_download.exe"
-TOOL_ROOT = _TOOL_ROOT_ENV or r"D:\信息收集中心\wx_video_download_safe_v260714_windows_x86_64"
+TOOL_EXE = _TOOL_EXE_ENV or os.path.join(TOOL_ROOT, "wx_video_download.exe")
+HERE = os.path.dirname(os.path.abspath(__file__))
+TOOL_ROOT = _TOOL_ROOT_ENV or os.path.join(HERE, "wx_video_download_safe_v260714_windows_x86_64")
 TOOL_CONFIG = os.path.join(TOOL_ROOT, "config.yaml")
 
 # 下载目录与文件名模板（与工具 config.yaml 对齐，可被环境变量覆盖）
-PREFERRED_DL_DIR = os.environ.get("WX_DL_DL_DIR", "").strip() or r"D:\信息收集中心\视频\video"
+PREFERRED_DL_DIR = os.environ.get("WX_DL_DL_DIR", "").strip() or DEFAULT_DOWNLOAD_DIR
 PREFERRED_TEMPLATE = os.environ.get("WX_DL_TEMPLATE", "").strip() or "{{author}}_{{download_at}}_{{filename}}_{{spec}}"
 
 # 常见视频号 feed id、finder URL、share link 的识别正则。
@@ -1467,7 +1468,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument(
         "--dir",
         default=PREFERRED_DL_DIR,
-        help="扫描目录，默认 D:\\信息收集中心\\视频\\video",
+        help="扫描目录，默认 ~/Downloads/wx_video_dl（可用 WX_DL_DL_DIR 覆盖）",
     )
     s.add_argument(
         "--apply", action="store_true",
