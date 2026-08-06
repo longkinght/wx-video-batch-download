@@ -1,0 +1,10 @@
+# 运行时文件
+gopeed.db
+app.log
+__pycache__/
+*.pyc
+
+# 本地临时
+_audit.json
+_test_manifest.md
+.DS_Store
