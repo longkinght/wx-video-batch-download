@@ -1,6 +1,6 @@
-# wx-video-batch-download
+# wxvideo-download-hb
 
-微信视频号批量下载的 WorkBuddy Skill —— 给你一个视频号链接，自动解析作者、批量下载全部（或指定日期后）视频，并生成核查清单。
+微信视频号下载（单条 / 批量）的 WorkBuddy Skill —— 给它一个视频号链接（单条）或作者主页（批量），自动解析、下载并生成核查清单。
 
 > 本仓库是**使用层工具集**（Skill + 脚本），不包含下载引擎本体。引擎是官方开源工具
 > [ltaoo/wx_channels_download](https://github.com/ltaoo/wx_channels_download)（MIT 协议），
@@ -45,10 +45,10 @@ pip install requests
 
 把本仓库的 `SKILL.md` 和 `scripts/` 复制到：
 
-- Windows：`C:\Users\<你>\.workbuddy\skills\wx-video-batch-download\`
+- Windows：`C:\Users\<你>\.workbuddy\skills\wxvideo-download-hb\`
 
 ```
-wx-video-batch-download/
+wxvideo-download-hb/
 ├── SKILL.md
 └── scripts/
     ├── wx_video_dl.py
@@ -93,7 +93,7 @@ python wx_video_dl.py organize --dir <目录> --apply  秒时间戳文件名 →
 | --- | --- | --- |
 | `WX_DL_TOOL_EXE` | 工具 exe 路径 | 脚本顶部常量 |
 | `WX_DL_TOOL_ROOT` | 工具目录 | 脚本顶部常量 |
-| `WX_DL_DL_DIR` | 下载目录 | `D:\信息收集中心\视频\video` |
+| `WX_DL_DL_DIR` | 下载目录 | `~/Downloads/wx_video_dl` |
 | `WX_DL_TEMPLATE` | 文件名模板 | `{{author}}_{{download_at}}_{{filename}}_{{spec}}` |
 
 ## 常见问题
@@ -115,6 +115,13 @@ A: 工具不热加载配置，修改后必须重启 `wx_video_download.exe`。
 - 本仓库仅提供自动化编排脚本，不包含任何抓取、解密引擎实现（引擎为第三方开源项目）。
 - 请仅下载你有权保存的内容（自己发布的、已获授权转载的等），并遵守微信平台服务条款与所在地法律法规。
 - 工具的下载、使用、分发请遵循其 MIT 协议及官方说明。
+
+
+## 关于作者
+
+本 Skill 由 **[@longkinght](https://github.com/longkinght)** 编写并维护。
+
+> 喜欢把重复性的下载 / 整理 / 归档工作自动化，习惯用 WorkBuddy Skill 把繁琐流程封装成「一句话就能跑」的工具。欢迎在仓库提 Issue 与 PR，也欢迎交流自动化玩法。
 
 ## License
 
