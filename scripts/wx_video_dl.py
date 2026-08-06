@@ -903,6 +903,16 @@ def cmd_add(args, client: WXChannelsClient):
     for it in items:
         if RE_USERNAME.fullmatch(it):
             authors.append(it)
+        elif "/sph/" in it or re.fullmatch(r"[A-Za-z0-9_-]{8,16}", it.strip()):
+            # sph 短链/短码 = 单个视频，直接解析出 feed_id 单条提交
+            try:
+                info = resolve_sph(client, it)
+                print(
+                    f"  [sph] 解析成功：{info['nickname']}《{info['title'][:30]}》→ 单条"
+                )
+                feed_ids.append(info["feed_id"])
+            except APIError as exc:
+                print(f"  ✗ sph 解析失败：{exc.msg}")
         else:
             for t in parse_targets(it):
                 if t.kind == "feed_id":
@@ -1183,14 +1193,20 @@ def cmd_go(args, client: WXChannelsClient):
         if RE_USERNAME.fullmatch(it):
             authors.append(it)
         elif "/sph/" in it or re.fullmatch(r"[A-Za-z0-9_-]{8,16}", it.strip()):
-            # weixin.qq.com/sph/<code> 短链：先解析作者，再按作者批量
+            # weixin.qq.com/sph/<code> 短链 = 单个视频
+            #   默认：只下这一个视频（resolve_sph 拿到 feed_id 直接提交）
+            #   --all：按作者批量（解析出作者后展开其全部视频）
             try:
                 info = resolve_sph(client, it)
                 print(
                     f"  [sph] 解析成功：{info['nickname']}《{info['title'][:30]}》"
                 )
-                if info["username"] and info["username"] not in authors:
-                    authors.append(info["username"])
+                if args.all and info["username"]:
+                    print(f"  [sph] --all：按作者批量（{info['username']}）")
+                    if info["username"] not in authors:
+                        authors.append(info["username"])
+                else:
+                    feed_ids.append(info["feed_id"])
             except APIError as exc:
                 print(f"  ✗ sph 解析失败：{exc.msg}")
         else:
@@ -1238,7 +1254,7 @@ def cmd_go(args, client: WXChannelsClient):
     final = watch_until_done(client, poll=args.poll, timeout=args.timeout)
     cnt = final.get("status_counts", {})
     print(f"\n完成：done={cnt.get('done', 0)}  err={cnt.get('error', 0)}")
-    if args.organize:
+    if not args.no_organize:
         cmd_organize(args, client)
     print("\n下载文件在：", PREFERRED_DL_DIR if not warns else "(旧目录，见上方警告)")
 
@@ -1437,6 +1453,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument(
         "--no-organize", action="store_true",
         help="完成后不整理文件名（默认整理）",
+    )
+    s.add_argument(
+        "--all", action="store_true",
+        help="sph 短链/视频也按作者批量下载（默认只下该单个视频）",
     )
     s.set_defaults(func=cmd_go)
 
